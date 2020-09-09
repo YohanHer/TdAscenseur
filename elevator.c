@@ -25,61 +25,57 @@ PersonList* exitElevator(Elevator *e){
     PersonList *test = e->persons;
     PersonList *sortie = NULL;
     PersonList *newOccupants=NULL;
-    if (test->person !=NULL && test->person->dest==e->currentFloor){
-        sortie->next=sortie;
-        sortie->person=test->person;
-    }
-    else{
-        newOccupants->next=newOccupants;
-        newOccupants->person=test->person;
-    }
-    while (test->next != NULL){
-        test = test->next;
-        if (test->person->dest==e->currentFloor){
-            sortie->next=sortie;
-            sortie->person=test->person;
+    if (test != NULL){
+        if (test->person !=NULL && test->person->dest==e->currentFloor){
+            sortie = insert(test->person, sortie);
         }
         else{
-            newOccupants->next=newOccupants;
-            newOccupants->person=test->person;
+            newOccupants = insert(test->person, newOccupants);
         }
+        while (test->next != NULL){
+            test = test->next;
+            if (test->person->dest==e->currentFloor){
+                sortie = insert(test->person, sortie);
+            }
+            else{
+                newOccupants = insert(test->person, newOccupants);
+            }
+        }
+        e->persons=newOccupants;
     }
-    e->persons=newOccupants;
     return sortie;
 }
 PersonList* enterElevator(Elevator *e, PersonList *waitinglist){
     PersonList *entree = NULL;
-    PersonList *newWaiting = NULL;
-    int places =e->capacity;
-    PersonList *testCapa = e->persons;
-    if (e->persons->person!=NULL){
-        places += -1;
-    }
-    while (testCapa->next != NULL){
-        places += -1;
-    }
-    if (waitinglist->person!=NULL && waitinglist->person->src==e->currentFloor && places>0){
-        places += -1;
-        entree->next=entree;
-        entree->person=waitinglist->person;
-    }
-    else {
-        newWaiting->next=newWaiting;
-        newWaiting->person=waitinglist->person;
-    }
-    while (places>0 && waitinglist->next!=NULL){
-        waitinglist = waitinglist->next;
-        if (waitinglist->person->src==e->currentFloor){
+    if (waitinglist != NULL){
+        PersonList *newWaiting = NULL;
+        int places =e->capacity;
+        PersonList *testCapa = e->persons;
+        if (e->persons->person!=NULL){
             places += -1;
-            entree->next=entree;
-            entree->person=waitinglist->person;
+        }
+        while (testCapa->next != NULL){
+            places += -1;
+        }
+        if (waitinglist->person!=NULL && waitinglist->person->src==e->currentFloor && places>0){
+            places += -1;
+            entree = insert(waitinglist->person, entree);
         }
         else {
-            newWaiting->next=newWaiting;
-            newWaiting->person=waitinglist->person;
+            newWaiting=insert(waitinglist->person, newWaiting);
         }
-    }
-    waitinglist =newWaiting;
+        while (waitinglist->next!=NULL){
+            waitinglist = waitinglist->next;
+            if (waitinglist->person->src==e->currentFloor && places > 0){
+                places += -1;
+                entree = insert(waitinglist->person, entree);
+            }
+            else {
+                newWaiting=insert(waitinglist->person, newWaiting);
+            }
+        }
+    	waitinglist =newWaiting;
+	}
     return entree;
 }
 
