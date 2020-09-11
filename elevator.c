@@ -82,7 +82,21 @@ PersonList* enterElevator(Elevator *e, PersonList *waitinglist){
 void stepElevator(Building *b){
     if (b->elevator->currentFloor==b->elevator->targetFloor){
         PersonList *sortant = exitElevator(b->elevator);
-        
+        if (sortant != NULL){
+            b->waitingLists[b->elevator->currentFloor] = insert(sortant->person, b->waitingLists[b->elevator->currentFloor]);
+            while (sortant->next != NULL){
+                sortant = sortant->next;
+                b->waitingLists[b->elevator->currentFloor] = insert(sortant->person, b->waitingLists[b->elevator->currentFloor]);
+            }
+        }
+        PersonList *entrant = enterElevator(b->elevator, b->waitingLists[b->elevator->currentFloor]);
+        if (entrant != NULL){
+            b->elevator->persons = insert(entrant->person, b->elevator->persons);
+            while (entrant->next != NULL){
+                entrant = entrant->next;
+                b->elevator->persons = insert(entrant->person, b->elevator->persons);
+            }
+        }
     }
     else {
         if (b->elevator->currentFloor<b->elevator->targetFloor){
