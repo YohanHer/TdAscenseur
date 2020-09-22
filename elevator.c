@@ -5,16 +5,15 @@
 #include "person.h"
 
 Elevator *create_elevator(int capacity, int currentFloor, PersonList *persons){
-    Elevator *e;
+    Elevator *e = (Elevator*)malloc(sizeof(Elevator));
     e->capacity=capacity;
     e->currentFloor=currentFloor;
     e->persons=persons;
-    e->targetFloor=currentFloor;
     return e;
 }
 
 Building *create_building(int nbFloor, Elevator *elevator, PersonList **waitingLists){
-    Building *b;
+    Building *b = (Building*)malloc(sizeof(Building));
     b->nbFloor=nbFloor;
     b->elevator=elevator;
     b->waitingLists=waitingLists;
@@ -23,8 +22,8 @@ Building *create_building(int nbFloor, Elevator *elevator, PersonList **waitingL
 
 PersonList* exitElevator(Elevator *e){
     PersonList *test = e->persons;
-    PersonList *sortie = NULL;
-    PersonList *newOccupants=NULL;
+    PersonList *sortie = (PersonList*)malloc(sizeof(PersonList));
+    PersonList *newOccupants=(PersonList*)malloc(sizeof(PersonList));
     if (test != NULL){
         if (test->person !=NULL && test->person->dest==e->currentFloor){
             sortie = insert(test->person, sortie);
@@ -46,32 +45,34 @@ PersonList* exitElevator(Elevator *e){
     return sortie;
 }
 PersonList* enterElevator(Elevator *e, PersonList *waitinglist){
-    PersonList *entree = NULL;
-    if (waitinglist != NULL){
-        PersonList *newWaiting = NULL;
+    PersonList *test = waitinglist;
+    PersonList *entree = (PersonList*)malloc(sizeof(PersonList));
+    if (test != NULL){
+        PersonList *newWaiting = (PersonList*)malloc(sizeof(PersonList));
         int places =e->capacity;
         PersonList *testCapa = e->persons;
-        if (e->persons->person!=NULL){
+        if (e->persons!=NULL){
             places += -1;
         }
-        while (testCapa->next != NULL){
+        while (testCapa != NULL){
             places += -1;
+            testCapa = testCapa->next;
         }
-        if (waitinglist->person!=NULL && waitinglist->person->src==e->currentFloor && places>0){
+        if (test->person!=NULL && test->person->src==e->currentFloor && places>0){
             places += -1;
-            entree = insert(waitinglist->person, entree);
+            entree = insert(test->person, entree);
         }
         else {
-            newWaiting=insert(waitinglist->person, newWaiting);
+            newWaiting=insert(test->person, newWaiting);
         }
-        while (waitinglist->next!=NULL){
-            waitinglist = waitinglist->next;
-            if (waitinglist->person->src==e->currentFloor && places > 0){
+        while (test->next!=NULL){
+            test = test->next;
+            if (test->person->src==e->currentFloor && places > 0){
                 places += -1;
-                entree = insert(waitinglist->person, entree);
+                entree = insert(test->person, entree);
             }
             else {
-                newWaiting=insert(waitinglist->person, newWaiting);
+                newWaiting=insert(test->person, newWaiting);
             }
         }
     	waitinglist =newWaiting;
